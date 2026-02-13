@@ -759,23 +759,59 @@
 
         reveals.forEach(el => observer.observe(el));
 
-        // Form handling (placeholder — replace with Beehiiv)
+        // Form handling — Beehiiv integration
+        const BEEHIIV_PUBLICATION_ID = '22f2a109-3f80-4b5d-99b7-abc0a5a54758';
+        
         document.querySelectorAll('.signup-form').forEach(form => {
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = form.querySelector('button');
                 const input = form.querySelector('input');
-                btn.textContent = '✓ You\'re in!';
-                btn.style.background = '#22C55E';
-                input.disabled = true;
+                const email = input.value.trim();
+                
+                if (!email) return;
+                
+                // Disable while submitting
                 btn.disabled = true;
+                input.disabled = true;
+                btn.textContent = 'Joining...';
+                
+                try {
+                    const response = await fetch(`https://api.beehiiv.com/v2/publications/${BEEHIIV_PUBLICATION_ID}/subscriptions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            utm_source: 'website',
+                            utm_medium: 'landing_page'
+                        })
+                    });
+                    
+                    if (response.ok || response.status === 409) {
+                        // Success or already subscribed
+                        btn.textContent = '✓ You\'re in!';
+                        btn.style.background = '#22C55E';
+                        input.value = '';
+                    } else {
+                        throw new Error('Subscription failed');
+                    }
+                } catch (error) {
+                    // Fallback: open Beehiiv subscribe page
+                    window.open(`https://buildyoursidekick.beehiiv.com/subscribe?email=${encodeURIComponent(email)}`, '_blank');
+                    btn.textContent = '✓ Check your email!';
+                    btn.style.background = '#22C55E';
+                    input.value = '';
+                }
+                
+                // Reset button after delay
                 setTimeout(() => {
                     btn.textContent = 'Get notified';
                     btn.style.background = '';
                     input.disabled = false;
                     btn.disabled = false;
-                    input.value = '';
-                }, 3000);
+                }, 4000);
             });
         });
     </script>
