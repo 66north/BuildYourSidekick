@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Sidekick — Build a personalized AI partner with Claude</title>
+    <meta name="description" content="A free interactive course that teaches you to build a personalized AI sidekick using Claude. You're the hero. Your AI is the loyal companion that makes you 10x more capable.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a1d23;
+            --surface: #21252d;
+            --surface-2: #282d36;
+            --border: #333a45;
+            --text: #F2F4F7;
+            --text-muted: #9BA3B0;
+            --text-dim: #6B7280;
+            --accent: #F97316;
+            --accent-glow: rgba(249, 115, 22, 0.15);
+            --accent-soft: rgba(249, 115, 22, 0.08);
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'Instrument Sans', -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.025;
+            z-index: 1000;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 24px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(26, 29, 35, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        nav.scrolled {
+            border-bottom-color: var(--border);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--serif);
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-tag {
+            font-size: 12px;
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 180px 0 120px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 32px;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-size: clamp(42px, 7vw, 64px);
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            color: var(--text);
+            margin-bottom: 24px;
+            animation: fadeUp 0.8s ease 0.1s both;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin-bottom: 48px;
+            animation: fadeUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Email signup */
+        .signup-form {
+            display: flex;
+            gap: 12px;
+            animation: fadeUp 0.8s ease 0.3s both;
+        }
+
+        .signup-form input[type="email"] {
+            flex: 1;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .signup-form input[type="email"]::placeholder {
+            color: var(--text-dim);
+        }
+
+        .signup-form input[type="email"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .signup-form button {
+            padding: 16px 28px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .signup-form button:hover {
+            background: #ea6b10;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 24px rgba(249, 115, 22, 0.3);
+        }
+
+        .signup-form button:active {
+            transform: translateY(0);
+        }
+
+        .signup-note {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-dim);
+            animation: fadeUp 0.8s ease 0.4s both;
+        }
+
+        /* Divider */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin: 0;
+        }
+
+        /* Philosophy section */
+        .philosophy {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-family: var(--serif);
+            font-size: clamp(28px, 4vw, 38px);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+
+        .philosophy p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* What you'll build */
+        .outcome {
+            padding: 100px 0;
+        }
+
+        .outcome-grid {
+            display: grid;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+
+        .outcome-card {
+            padding: 32px;
+            background: var(--surface);
+            transition: background 0.3s ease;
+        }
+
+        .outcome-card:hover {
+            background: var(--surface-2);
+        }
+
+        .outcome-number {
+            font-family: var(--serif);
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .outcome-card h3 {
+            font-family: var(--serif);
+            font-size: 20px;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .outcome-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* The course */
+        .course {
+            padding: 100px 0;
+        }
+
+        .module-list {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .module-item:last-child {
+            border-bottom: none;
+        }
+
+        .module-num {
+            font-family: var(--serif);
+            font-size: 14px;
+            color: var(--text-dim);
+            min-width: 24px;
+        }
+
+        .module-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .module-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .module-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            white-space: nowrap;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .module-tag.soon {
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        /* Terminal preview */
+        .terminal {
+            margin-top: 48px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .terminal-bar {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .terminal-dot:nth-child(1) { background: #EF4444; }
+        .terminal-dot:nth-child(2) { background: #EAB308; }
+        .terminal-dot:nth-child(3) { background: #22C55E; }
+
+        .terminal-title {
+            margin-left: 12px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .terminal-body {
+            padding: 24px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+
+        .terminal-body .prompt {
+            color: var(--accent);
+        }
+
+        .terminal-body .command {
+            color: var(--text);
+        }
+
+        .terminal-body .output {
+            color: var(--text-dim);
+        }
+
+        .terminal-body .highlight {
+            color: #22C55E;
+        }
+
+        .terminal-line {
+            display: block;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: var(--accent);
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* CTA */
+        .cta {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .cta .signup-form {
+            justify-content: center;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero {
+                padding: 140px 0 80px;
+            }
+
+            .signup-form {
+                flex-direction: column;
+            }
+
+            .signup-form button {
+                width: 100%;
+            }
+
+            .module-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .module-tag {
+                margin-left: 44px;
+            }
+
+            footer .container {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .philosophy, .outcome, .course, .cta {
+                padding: 72px 0;
+            }
+
+            .outcome-card {
+                padding: 24px;
+            }
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="nav">
+        <div class="container">
+            <a href="#" class="logo">Build Your <span>Sidekick</span></a>
+            <span class="nav-tag">Coming Soon</span>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">Building in public</div>
+            <h1>Build your <em>AI&nbsp;sidekick</em></h1>
+            <p class="hero-sub">A free interactive course that teaches you to build a personalized AI partner with Claude. You're the hero. Your sidekick makes you 10x more capable.</p>
+            <form class="signup-form" id="signup-hero">
+                <input type="email" placeholder="your@email.com" required>
+                <button type="submit">Get notified</button>
+            </form>
+            <p class="signup-note">Free course. No spam. Get notified when we launch.</p>
+        </div>
+    </section>
+
+    <div class="container"><div class="divider"></div></div>
+
+    <section class="philosophy reveal">
+        <div class="container">
+            <div class="section-label">The philosophy</div>
+            <h2>You're the hero.<br>Your AI is the sidekick.</h2>
+            <p>Every Batman has a Robin. Every hero has a loyal companion that makes them stronger. That's what your AI should be — not a replacement, not just a tool, but a partner that knows your work, your style, your context.</p>
+            <p>This course walks you through building a real knowledge base for your AI — your role, your preferences, your projects, your writing style. Then it teaches your sidekick to keep that knowledge base alive, updating itself as you work together. By the end, you have an AI partner that already knows you.</p>
+        </div>
+    </section>
+
+    <div class="container"><div class="divider"></div></div>
+
+    <section class="outcome reveal">
+        <div class="container">
+            <div class="section-label">What you'll build</div>
+            <h2>A working sidekick, not a certificate</h2>
+            <div class="outcome-grid">
+                <div class="outcome-card">
+                    <div class="outcome-number">01</div>
+                    <h3>A brain that knows you</h3>
+                    <p>A structured knowledge base with your role, your preferences, your projects, your team context — everything your sidekick needs to be genuinely useful from the first message.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-number">02</div>
+                    <h3>A memory that grows</h3>
+                    <p>Your sidekick learns to update its own knowledge base — logging decisions, capturing new context, evolving with your work. It gets smarter every time you use it.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-number">03</div>
+                    <h3>Your voice, your style</h3>
+                    <p>Calibrated to how you write, how you think, and how you communicate. Drafts that sound like you, feedback in the tone you'd use, documents in your format.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container"><div class="divider"></div></div>
+
+    <section class="course reveal">
+        <div class="container">
+            <div class="section-label">The course</div>
+            <h2>Taught inside Claude Code itself</h2>
+            <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 8px;">No videos. No slideshows. You learn by doing — guided interactively by Claude as you build your sidekick step by step.</p>
+
+            <div class="module-list">
+                <div class="module-item">
+                    <span class="module-num">00</span>
+                    <div>
+                        <div class="module-title">Getting Started</div>
+                        <div class="module-desc">The sidekick philosophy, installation, and creating your sidekick's first home folder.</div>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-num">01</span>
+                    <div>
+                        <div class="module-title">Meet Your Sidekick</div>
+                        <div class="module-desc">Learn the fundamentals while feeding your sidekick its first real knowledge — about you, your role, and your work.</div>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-num">02</span>
+                    <div>
+                        <div class="module-title">Building Your Sidekick's Brain</div>
+                        <div class="module-desc">Design a living knowledge base. Fill it with your real context. Teach your sidekick to update it automatically.</div>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-num">03</span>
+                    <div>
+                        <div class="module-title">Sidekick Superpowers</div>
+                        <div class="module-desc">Parallel agents, specialized personas, multi-perspective feedback, complex workflows.</div>
+                    </div>
+                    <span class="module-tag soon">Coming later</span>
+                </div>
+                <div class="module-item">
+                    <span class="module-num">04</span>
+                    <div>
+                        <div class="module-title">Your Sidekick at Work</div>
+                        <div class="module-desc">Role-specific exercises — put your fully configured sidekick to work on real tasks.</div>
+                    </div>
+                    <span class="module-tag soon">Coming later</span>
+                </div>
+            </div>
+
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span>
+                    <span class="terminal-dot"></span>
+                    <span class="terminal-dot"></span>
+                    <span class="terminal-title">Terminal — claude</span>
+                </div>
+                <div class="terminal-body">
+                    <span class="terminal-line"><span class="prompt">~ $</span> <span class="command">claude</span></span>
+                    <span class="terminal-line"><span class="output">Welcome to Claude Code v1.0</span></span>
+                    <span class="terminal-line">&nbsp;</span>
+                    <span class="terminal-line"><span class="prompt">→</span> <span class="command">/start</span></span>
+                    <span class="terminal-line">&nbsp;</span>
+                    <span class="terminal-line"><span class="highlight">🤝 Welcome to Build Your Sidekick.</span></span>
+                    <span class="terminal-line"><span class="output">I'll guide you through building an AI partner</span></span>
+                    <span class="terminal-line"><span class="output">that knows your role, your style, and your work.</span></span>
+                    <span class="terminal-line">&nbsp;</span>
+                    <span class="terminal-line"><span class="output">First, let's create your sidekick's brain.</span></span>
+                    <span class="terminal-line"><span class="highlight">✓ Created my-sidekick/CLAUDE.md</span></span>
+                    <span class="terminal-line"><span class="highlight">✓ Created my-sidekick/context/role.md</span></span>
+                    <span class="terminal-line"><span class="highlight">✓ Created my-sidekick/context/preferences.md</span></span>
+                    <span class="terminal-line">&nbsp;</span>
+                    <span class="terminal-line"><span class="output">Tell me about your role. What do you do?</span></span>
+                    <span class="terminal-line"><span class="cursor"></span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container"><div class="divider"></div></div>
+
+    <section class="cta reveal">
+        <div class="container">
+            <div class="section-label">Be first</div>
+            <h2>Get notified when we launch</h2>
+            <p>Free course. Built in public. Launching soon.</p>
+            <form class="signup-form" id="signup-cta">
+                <input type="email" placeholder="your@email.com" required>
+                <button type="submit">Get notified</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <span class="footer-text">© 2026 Build Your Sidekick</span>
+            <div class="footer-links">
+                <a href="https://github.com/" target="_blank">GitHub</a>
+                <a href="#" target="_blank">Twitter</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Nav scroll effect
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // Reveal on scroll
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        reveals.forEach(el => observer.observe(el));
+
+        // Form handling (placeholder — replace with Beehiiv)
+        document.querySelectorAll('.signup-form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = form.querySelector('button');
+                const input = form.querySelector('input');
+                btn.textContent = '✓ You\'re in!';
+                btn.style.background = '#22C55E';
+                input.disabled = true;
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.textContent = 'Get notified';
+                    btn.style.background = '';
+                    input.disabled = false;
+                    btn.disabled = false;
+                    input.value = '';
+                }, 3000);
+            });
+        });
+    </script>
+
+</body>
+</html>
