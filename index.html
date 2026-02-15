@@ -759,9 +759,11 @@
 
         reveals.forEach(el => observer.observe(el));
 
-        // Form handling — Beehiiv integration
+        // Form handling — Google Sheets integration
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuBtmW6OzzIQgkWQ13cubnlV7tnFMi-Q_a2WbBLVJvaSwS19R-eCDCDf8gtTQf1HKBvA/exec';
+        
         document.querySelectorAll('.signup-form').forEach(form => {
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = form.querySelector('button');
                 const input = form.querySelector('input');
@@ -769,14 +771,38 @@
                 
                 if (!email) return;
                 
-                // Show joining state
+                // Disable while submitting
                 btn.disabled = true;
                 input.disabled = true;
                 btn.textContent = 'Joining...';
                 
-                // Redirect to Beehiiv with email pre-filled
-                // This is the most reliable method - Beehiiv handles everything
-                window.location.href = 'https://buildyoursidekick.beehiiv.com/subscribe?email=' + encodeURIComponent(email);
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email })
+                    });
+                    
+                    // Show success
+                    btn.textContent = '✓ You\'re in!';
+                    btn.style.background = '#22C55E';
+                    input.value = '';
+                    
+                } catch (error) {
+                    btn.textContent = 'Try again';
+                    btn.style.background = '#EF4444';
+                }
+                
+                // Reset after delay
+                setTimeout(() => {
+                    btn.textContent = 'Get notified';
+                    btn.style.background = '';
+                    input.disabled = false;
+                    btn.disabled = false;
+                }, 4000);
             });
         });
     </script>
