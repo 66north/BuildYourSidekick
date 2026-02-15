@@ -596,6 +596,7 @@
             <p class="hero-sub">A free interactive course that teaches you to build a personalized AI partner with Claude. Not a chatbot — a sidekick that knows you, your work, and your style.</p>
             <form class="signup-form" id="signup-hero">
                 <input type="email" placeholder="your@email.com" required>
+                <input type="text" name="website" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
                 <button type="submit">Get notified</button>
             </form>
             <p class="signup-note">Free course. No spam. Get notified when we launch.</p>
@@ -725,6 +726,7 @@
             <p>Free course. Built in public. Launching soon.</p>
             <form class="signup-form" id="signup-cta">
                 <input type="email" placeholder="your@email.com" required>
+                <input type="text" name="website" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
                 <button type="submit">Get notified</button>
             </form>
         </div>
@@ -766,8 +768,17 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = form.querySelector('button');
-                const input = form.querySelector('input');
+                const input = form.querySelector('input[type="email"]');
+                const honeypot = form.querySelector('input[name="website"]');
                 const email = input.value.trim();
+                
+                // If honeypot is filled, silently reject (it's a bot)
+                if (honeypot && honeypot.value !== '') {
+                    btn.textContent = '✓ You\'re in!';
+                    btn.style.background = '#22C55E';
+                    input.value = '';
+                    return;
+                }
                 
                 if (!email) return;
                 
@@ -777,13 +788,14 @@
                 btn.textContent = 'Joining...';
                 
                 try {
+                    const formData = new FormData();
+                    formData.append('email', email);
+                    formData.append('website', ''); // honeypot field
+                    
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email: email })
+                        body: formData
                     });
                     
                     // Show success
