@@ -1,0 +1,35 @@
+# Private - not pushed to GitHub
+CLAUDE.md
+CLAUDE.local.md
+course/
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+.obsidian/
+
+# Node (for future use)
+node_modules/
+.next/
+dist/
+.vercel/
+
+# Environment and secrets
+.env
+.env.local
+.env*.local
+
+# Binary docs
+*.docx
+*.doc
+
+# Build artifacts
+*.log

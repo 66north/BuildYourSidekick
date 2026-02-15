@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Sidekick — Work Like You Have Backup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1f2e;
+            --bg-secondary: #242a3d;
+            --bg-card: #2a3147;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9ca3b8;
+            --text-muted: #6b7280;
+            --accent: #f97316;
+            --accent-glow: rgba(249, 115, 22, 0.15);
+            --accent-hover: #fb923c;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 24px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-mark {
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+
+        .logo-mark .circle {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-primary);
+            border-radius: 50%;
+        }
+
+        .logo-mark .circle:first-child {
+            top: 0;
+            left: 0;
+        }
+
+        .logo-mark .circle:last-child {
+            bottom: 0;
+            right: 0;
+            border-color: var(--accent);
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-cta {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 80px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .tagline {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.1s forwards;
+        }
+
+        .hero h1 span {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 0.65em;
+            margin-top: 8px;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 580px;
+            margin: 0 auto 40px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.2s forwards;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.3s forwards;
+        }
+
+        .hero-cta:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .hero-cta svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .free-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 16px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.4s forwards;
+        }
+
+        /* Outcomes Section */
+        .outcomes {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .outcomes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .outcomes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .outcome-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .outcome-card:hover {
+            border-color: rgba(249, 115, 22, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .outcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .outcome-card:hover::before {
+            opacity: 1;
+        }
+
+        .outcome-icon {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+        }
+
+        .outcome-card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .outcome-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Featured outcome (full width) */
+        .outcome-card.featured {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(249, 115, 22, 0.08) 100%);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        .outcome-card.featured h3 {
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+
+        /* What You'll Build */
+        .build-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .build-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .build-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        .build-text h2 {
+            font-size: clamp(1.8rem, 4vw, 2.3rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+
+        .build-text p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 24px;
+        }
+
+        .build-list {
+            list-style: none;
+        }
+
+        .build-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .build-list li::before {
+            content: '→';
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        .terminal-preview {
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b3b3b;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+        }
+
+        .terminal-prompt {
+            color: var(--accent);
+        }
+
+        .terminal-command {
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-muted);
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: var(--accent);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Modules */
+        .modules {
+            padding: 80px 0;
+        }
+
+        .module-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .module-item:hover {
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        .module-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 6px 10px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .module-info h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .module-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            margin-bottom: 36px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Newsletter Form */
+        .newsletter-form {
+            display: flex;
+            gap: 12px;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 500px) {
+            .newsletter-form {
+                flex-direction: column;
+            }
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 16px 20px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .newsletter-form input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .newsletter-form input:focus {
+            border-color: var(--accent);
+        }
+
+        .newsletter-form button {
+            padding: 16px 28px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .newsletter-form button:hover {
+            background: var(--accent-hover);
+        }
+
+        .privacy-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-content">
+            <a href="/" class="logo">
+                <div class="logo-mark">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+                <span class="logo-text">Build Your Sidekick</span>
+            </a>
+            <a href="#start" class="nav-cta">Start Free →</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <p class="tagline">Free Interactive Course</p>
+            <h1>Work Like You Have Backup<span>Build an AI sidekick that knows your work</span></h1>
+            <p class="hero-description">Stop re-explaining yourself to AI. Build a personalized sidekick that remembers your context, matches your voice, and gets better over time.</p>
+            <a href="#start" class="hero-cta">
+                Start Building
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+            </a>
+            <p class="free-tag">100% free · No signup required · Learn by doing</p>
+        </div>
+    </section>
+
+    <section class="outcomes">
+        <div class="container">
+            <div class="section-header">
+                <h2>The Unfair Advantage</h2>
+                <p>What happens when your AI actually knows your work</p>
+            </div>
+
+            <div class="outcomes-grid">
+                <div class="outcome-card featured">
+                    <div class="outcome-icon">⚡</div>
+                    <h3>You punch above your weight</h3>
+                    <p>Solo operators producing at the level of small teams. Employees delivering like they have a secret staff. The leverage is invisible to others — they just see someone who somehow handles everything.</p>
+                </div>
+
+                <div class="outcome-card">
+                    <div class="outcome-icon">🎯</div>
+                    <h3>Always one step ahead</h3>
+                    <p>Walk into meetings already prepared. Your sidekick synthesized the context, anticipated questions, drafted your talking points. You become the person who's always ready.</p>
+                </div>
+
+                <div class="outcome-card">
+                    <div class="outcome-icon">✍️</div>
+                    <h3>Output that sounds like you</h3>
+                    <p>No more "AI voice" that needs heavy editing. Your sidekick learns your style, your frameworks, your way of thinking. First drafts that need polish, not rewrites.</p>
+                </div>
+
+                <div class="outcome-card">
+                    <div class="outcome-icon">🧘</div>
+                    <h3>Calm when others panic</h3>
+                    <p>Tight deadline? Unexpected request? You have a system that absorbs chaos. That composure becomes part of your identity.</p>
+                </div>
+
+                <div class="outcome-card">
+                    <div class="outcome-icon">📈</div>
+                    <h3>A system that compounds</h3>
+                    <p>Unlike one-off prompts, your sidekick accumulates knowledge. Three months in, it's dramatically more useful than day one.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="build-section">
+        <div class="container">
+            <div class="build-content">
+                <div class="build-text">
+                    <h2>Not another AI tutorial</h2>
+                    <p>This isn't about learning prompts. It's about building a persistent system — with a living knowledge base that grows with your work.</p>
+                    <ul class="build-list">
+                        <li>Set up a workspace your AI actually remembers</li>
+                        <li>Feed it your real context: projects, preferences, constraints</li>
+                        <li>Train it to match your voice and thinking style</li>
+                        <li>Build self-updating knowledge that stays current</li>
+                        <li>Finish with a working system you'll use daily</li>
+                    </ul>
+                </div>
+
+                <div class="terminal-preview">
+                    <div class="terminal-header">
+                        <div class="terminal-dot"></div>
+                        <div class="terminal-dot"></div>
+                        <div class="terminal-dot"></div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">~/sidekick $</span>
+                            <span class="terminal-command"> /start</span>
+                        </div>
+                        <div class="terminal-line terminal-output">
+                            Welcome back. I've reviewed your recent notes.
+                        </div>
+                        <div class="terminal-line terminal-output">
+                            You have the board meeting Thursday. Want me
+                        </div>
+                        <div class="terminal-line terminal-output">
+                            to draft talking points based on last quarter's
+                        </div>
+                        <div class="terminal-line terminal-output">
+                            performance data you shared?
+                        </div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">~/sidekick $</span>
+                            <span class="terminal-cursor"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="modules">
+        <div class="container">
+            <div class="section-header">
+                <h2>What You'll Learn</h2>
+                <p>Hands-on modules you complete inside Claude Code</p>
+            </div>
+
+            <div class="module-list">
+                <div class="module-item">
+                    <span class="module-number">00</span>
+                    <div class="module-info">
+                        <h3>Getting Started</h3>
+                        <p>The sidekick philosophy + your first setup</p>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-number">01</span>
+                    <div class="module-info">
+                        <h3>Meet Your Sidekick</h3>
+                        <p>Fundamentals while feeding your AI real information about you</p>
+                    </div>
+                </div>
+                <div class="module-item">
+                    <span class="module-number">02</span>
+                    <div class="module-info">
+                        <h3>Building the Brain</h3>
+                        <p>Create structured knowledge bases that grow with your work</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="start">
+        <div class="container">
+            <h2>Ready to build your advantage?</h2>
+            <p>Get notified when the course launches. No spam — just one email when it's ready.</p>
+            
+            <form class="newsletter-form" action="https://app.beehiiv.com/forms/..." method="POST">
+                <input type="email" name="email" placeholder="you@email.com" required>
+                <button type="submit">Notify Me</button>
+            </form>
+            <p class="privacy-note">We respect your inbox. Unsubscribe anytime.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built by <a href="#">Daniel</a> · Powered by Claude</p>
+        </div>
+    </footer>
+</body>
+</html>
